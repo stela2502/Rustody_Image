@@ -1,0 +1,53 @@
+Bootstrap: docker
+From: alpine:latest
+
+%post
+  # Update and install necessary packages using apk (Alpine package manager)
+  apk update && apk add --no-cache \
+      bash \
+      curl \
+      gcc \
+      clang \
+      musl-dev \
+      libressl-dev \
+      build-base \
+      cmake \
+      git \
+      cargo \
+      perl \
+      make \
+      linux-headers \
+
+  # Install Rust
+  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+
+  # Ensure Rust is on the PATH
+  export PATH="$HOME/.cargo/bin:$PATH"
+
+  # Create the target directory for Rust binaries
+  mkdir -p /usr/local/bin
+
+  # Clone and build Rustody
+  git clone https://github.com/stela2502/Rustody.git
+  cd Rustody
+  cargo build -r
+  ./install_resources_unix.sh
+  cd ..
+  rm -Rf Rustody
+
+  # Install build multi_subset_bam
+  CARGO_INSTALL_ROOT=/usr/local cargo install --git https://github.com/stela2502/multi_subset_bam.git
+
+  # Install bam_aligner
+  CARGO_INSTALL_ROOT=/usr/local cargo install --git https://github.com/stela2502/bam_aligner.git
+
+  # Download the specific file from the Rustody repo
+  curl -O https://github.com/stela2502/Rustody/min2//branch/filename
+
+  # Clean up (Alpine doesn't need as much cleaning up as Debian/Ubuntu)
+  rm -rf /var/cache/apk/*
+
+%environment
+  export PATH="/usr/local/bin:$PATH"
+  export RustodyFiles="/opt/Rustody_files"
+

@@ -1,0 +1,21 @@
+#!/bin/bash
+
+# Path to your Singularity image
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+VERSION=1.0
+SINGULARITY_IMAGE="$SCRIPT_DIR/../Rustody_vi${VERSION}.sif"
+
+# Check if a command was provided
+if [ "$#" -lt 1 ]; then
+  echo "Usage: Rustody <command> [options...]"
+  echo "With commands being described there 
+  https://github.com/stela2502/Rustody 
+  https://github.com/stela2502/bam_aligner
+  https://github.com/stela2502/subset_bam
+  "
+  exit 1
+fi
+
+# Run the command inside the Singularity image
+singularity exec "$SINGULARITY_IMAGE" "$@"
+
